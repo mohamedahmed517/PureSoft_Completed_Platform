@@ -14,7 +14,7 @@ def init_gemini_model():
         try:
             genai.configure(api_key=Config.GEMINI_API_KEY)
             model = genai.GenerativeModel(
-                'gemini-2.0-flash-exp',
+                'gemini-2.5-flash',
                 generation_config={
                     "temperature": 0.9, 
                     "max_output_tokens": 2048
@@ -38,5 +38,6 @@ def init_gemini_model():
                 time.sleep(2 ** attempt)
             else:
                 raise
+
 
 MODEL = init_gemini_model()
