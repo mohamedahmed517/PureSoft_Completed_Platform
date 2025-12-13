@@ -28,8 +28,9 @@ def build_product_catalog():
         try:
             name = str(row['product_name_ar']).strip()
             price = float(row['sell_price'])
+            cat = str(row['category']).strip()
             pid = str(row['product_id'])
-            products_text += f"• {name} | السعر: {price} جنيه | اللينك: https://afaq-stores.com/product-details/{pid}\n"
+            products_text += f"• {name} | السعر: {price} جنيه | الكاتيجوري: {cat} | اللينك: https://afaq-stores.com/product-details/{pid}\n"
         except Exception as e:
             logger.warning(f"⚠️  Error processing product row: {e}")
             continue
@@ -38,5 +39,4 @@ def build_product_catalog():
 
 def get_product_count():
     """Get total number of products"""
-
     return len(load_products())
