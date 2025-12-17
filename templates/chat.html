@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آفاق ستورز - البوت الذكي</title>
+    <title>محادثة آفاق ستورز</title>
     <style>
         * {
             margin: 0;
@@ -14,197 +14,180 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
 
         .container {
             width: 100%;
             max-width: 900px;
+            height: 90vh;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-            height: 90vh;
-            max-height: 800px;
+            overflow: hidden;
         }
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 24px;
             margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
 
-        .header p {
+        .header .user-info {
             font-size: 14px;
             opacity: 0.9;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 13px;
         }
 
         .chat-area {
             flex: 1;
             overflow-y: auto;
-            padding: 25px;
-            background: #f8f9fa;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            padding: 20px;
+            background: #f5f5f5;
         }
 
         .message {
+            margin-bottom: 15px;
             display: flex;
-            gap: 12px;
-            max-width: 80%;
-            animation: slideIn 0.3s ease;
+            animation: fadeIn 0.3s;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.user {
-            align-self: flex-start;
-            flex-direction: row-reverse;
+            justify-content: flex-end;
         }
 
         .message.assistant {
-            align-self: flex-end;
-        }
-
-        .message-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .message.user .message-avatar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .message.assistant .message-avatar {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            justify-content: flex-start;
         }
 
         .message-content {
-            background: white;
+            max-width: 70%;
             padding: 12px 18px;
             border-radius: 18px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            line-height: 1.6;
             word-wrap: break-word;
+            white-space: pre-wrap;
+            line-height: 1.6;
         }
 
         .message.user .message-content {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .message.assistant .message-content a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px solid #667eea;
+            transition: all 0.2s;
+            word-break: break-all;
+        }
+
+        .message.assistant .message-content a:hover {
+            color: #764ba2;
+            border-bottom-color: #764ba2;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 2px 4px;
+            border-radius: 4px;
         }
 
         .input-area {
-            padding: 20px 25px;
+            padding: 20px;
             background: white;
             border-top: 1px solid #e0e0e0;
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
         }
 
-        .input-area input {
+        #messageInput {
             flex: 1;
-            padding: 14px 20px;
+            padding: 12px 18px;
             border: 2px solid #e0e0e0;
             border-radius: 25px;
             font-size: 15px;
             outline: none;
-            transition: all 0.3s;
+            transition: border-color 0.3s;
+            font-family: inherit;
         }
 
-        .input-area input:focus {
+        #messageInput:focus {
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .btn {
-            padding: 14px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            padding: 12px 24px;
             border: none;
             border-radius: 25px;
             cursor: pointer;
             font-size: 15px;
             font-weight: 600;
             transition: all 0.3s;
-            white-space: nowrap;
+            outline: none;
         }
 
-        .btn:hover {
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
+        .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         .btn-secondary {
-            background: #6c757d;
-            padding: 10px 18px;
-            font-size: 13px;
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
         }
 
         .auth-container {
             width: 100%;
-            max-width: 450px;
+            max-width: 400px;
             background: white;
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
         .auth-container h2 {
             text-align: center;
             margin-bottom: 30px;
             color: #333;
-            font-size: 28px;
         }
 
         .form-group {
@@ -214,208 +197,210 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #555;
-            font-weight: 500;
+            color: #666;
+            font-weight: 600;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 12px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 15px;
-            transition: all 0.3s;
+            outline: none;
+            transition: border-color 0.3s;
         }
 
         .form-group input:focus {
-            outline: none;
             border-color: #667eea;
         }
 
-        .auth-toggle {
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .success-message {
+            color: #27ae60;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .toggle-auth {
             text-align: center;
             margin-top: 20px;
             color: #666;
         }
 
-        .auth-toggle a {
+        .toggle-auth a {
             color: #667eea;
             text-decoration: none;
             font-weight: 600;
+            cursor: pointer;
         }
 
-        .error-msg {
-            background: #fee;
-            color: #c33;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+        .toggle-auth a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
             text-align: center;
+            padding: 20px;
+            color: #666;
         }
 
         .typing-indicator {
             display: none;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 18px;
+            padding: 10px;
             background: white;
             border-radius: 18px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            max-width: 80px;
+            width: 60px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .typing-indicator.show {
-            display: flex;
-        }
-
-        .typing-dot {
+        .typing-indicator span {
+            display: inline-block;
             width: 8px;
             height: 8px;
-            background: #667eea;
             border-radius: 50%;
-            animation: typing 1.4s infinite;
+            background: #667eea;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
         }
 
-        .typing-dot:nth-child(2) {
-            animation-delay: 0.2s;
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
         }
 
-        .typing-dot:nth-child(3) {
-            animation-delay: 0.4s;
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
         }
 
-        @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
             }
-            30% {
-                transform: translateY(-10px);
+            40% {
+                transform: scale(1);
             }
         }
 
-        .image-preview {
-            max-width: 200px;
-            max-height: 200px;
-            border-radius: 10px;
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
             margin-top: 10px;
         }
 
-        #imageInput {
-            display: none;
-        }
-
-        .icon-btn {
-            background: #f0f0f0;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            transition: all 0.3s;
-        }
-
-        .icon-btn:hover {
-            background: #e0e0e0;
-            transform: scale(1.1);
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
         }
 
         @media (max-width: 768px) {
             .container {
                 height: 100vh;
-                max-height: none;
                 border-radius: 0;
+                max-width: 100%;
             }
-            
-            .message {
+
+            .auth-container {
                 max-width: 90%;
+            }
+
+            .message-content {
+                max-width: 85%;
             }
         }
     </style>
 </head>
 <body>
     <div class="auth-container" id="authContainer">
-        <h2>🤖 آفاق ستورز</h2>
-        <div id="authError" class="error-msg" style="display: none;"></div>
-
-        <form id="loginForm">
-            <div class="form-group">
-                <label>اسم المستخدم</label>
-                <input type="text" id="loginUsername" required>
+        <h2 id="authTitle">تسجيل الدخول</h2>
+        <form id="authForm">
+            <div class="form-group" id="usernameGroup">
+                <label for="username">اسم المستخدم</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group" id="emailGroup" style="display: none;">
+                <label for="email">البريد الإلكتروني</label>
+                <input type="email" id="email">
             </div>
             <div class="form-group">
-                <label>كلمة المرور</label>
-                <input type="password" id="loginPassword" required>
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" required>
             </div>
-            <button type="submit" class="btn" style="width: 100%;">تسجيل الدخول</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%;" id="authSubmitBtn">دخول</button>
+            <div id="authMessage"></div>
         </form>
-
-        <form id="registerForm" style="display: none;">
-            <div class="form-group">
-                <label>اسم المستخدم</label>
-                <input type="text" id="registerUsername" required>
-            </div>
-            <div class="form-group">
-                <label>البريد الإلكتروني</label>
-                <input type="email" id="registerEmail" required>
-            </div>
-            <div class="form-group">
-                <label>كلمة المرور</label>
-                <input type="password" id="registerPassword" required>
-            </div>
-            <button type="submit" class="btn" style="width: 100%;">إنشاء حساب</button>
-        </form>
-
-        <div class="auth-toggle">
+        <div class="toggle-auth">
             <span id="toggleText">ليس لديك حساب؟</span>
-            <a href="#" id="toggleAuth">إنشاء حساب جديد</a>
+            <a id="toggleLink">إنشاء حساب</a>
         </div>
     </div>
 
     <div class="container" id="chatContainer" style="display: none;">
         <div class="header">
-            <h1>🤖 آفاق ستورز - البوت الذكي</h1>
-            <p>مساعدك الذكي للتسوق والمحادثة</p>
+            <h1>🤖 آفاق ستورز</h1>
             <div class="user-info">
-                <span>مرحباً، <strong id="usernameDisplay"></strong></span>
-                <button class="btn btn-secondary" onclick="logout()">تسجيل الخروج</button>
+                مرحباً، <span id="currentUsername"></span>
+                <button class="logout-btn" onclick="logout()">تسجيل خروج</button>
             </div>
         </div>
 
         <div class="chat-area" id="chatArea">
             <div class="message assistant">
-                <div class="message-avatar">🤖</div>
                 <div class="message-content">
                     أهلاً وسهلاً! أنا البوت الذكي بتاع آفاق ستورز 👋<br>
                     ابعتلي أي سؤال عن المنتجات أو صورة وأنا هساعدك!
                 </div>
             </div>
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
 
         <div class="input-area">
-            <input type="file" id="imageInput" accept="image/*">
-            <button class="icon-btn" onclick="document.getElementById('imageInput').click()" title="إرفاق صورة">
-                📷
-            </button>
-            <input 
-                type="text" 
-                id="messageInput" 
-                placeholder="اكتب رسالتك هنا..."
-                onkeypress="if(event.key==='Enter') sendMessage()"
-            >
-            <button class="btn" onclick="sendMessage()" id="sendBtn">إرسال</button>
-            <button class="btn btn-secondary" onclick="clearChat()">مسح المحادثة</button>
+            <input type="text" id="messageInput" placeholder="اكتب رسالتك هنا..." />
+            <button class="btn btn-secondary" onclick="clearChat()">مسح</button>
+            <button class="btn btn-primary" id="sendBtn" onclick="sendMessage()">إرسال</button>
         </div>
     </div>
 
     <script>
+        let isLogin = true;
         let currentUser = null;
-        let selectedImage = null;
 
-        checkAuth();
+        function linkify(text) {
+            const escapeHtml = (str) => {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            };
+            
+            let escaped = escapeHtml(text);
+            
+            escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            
+            const urlRegex = /(https?:\/\/[^\s<]+)|(www\.[^\s<]+)/g;
+            
+            return escaped.replace(urlRegex, function(url) {
+                let href = url;
+                if (url.startsWith('www.')) {
+                    href = 'https://' + url;
+                }
+                return `<a href="${href}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+            });
+        }
 
         async function checkAuth() {
             try {
@@ -425,96 +410,81 @@
                 if (data.success) {
                     currentUser = data.user;
                     showChat();
+                    loadHistory();
                 }
             } catch (error) {
-                console.log('Not authenticated');
+                console.error('Auth check error:', error);
             }
         }
 
-        document.getElementById('toggleAuth').addEventListener('click', (e) => {
-            e.preventDefault();
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const toggleText = document.getElementById('toggleText');
-            const toggleLink = document.getElementById('toggleAuth');
-
-            if (loginForm.style.display === 'none') {
-                loginForm.style.display = 'block';
-                registerForm.style.display = 'none';
-                toggleText.textContent = 'ليس لديك حساب؟';
-                toggleLink.textContent = 'إنشاء حساب جديد';
+        document.getElementById('toggleLink').addEventListener('click', function() {
+            isLogin = !isLogin;
+            
+            if (isLogin) {
+                document.getElementById('authTitle').textContent = 'تسجيل الدخول';
+                document.getElementById('emailGroup').style.display = 'none';
+                document.getElementById('authSubmitBtn').textContent = 'دخول';
+                document.getElementById('toggleText').textContent = 'ليس لديك حساب؟';
+                document.getElementById('toggleLink').textContent = 'إنشاء حساب';
             } else {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
-                toggleText.textContent = 'لديك حساب بالفعل؟';
-                toggleLink.textContent = 'تسجيل الدخول';
+                document.getElementById('authTitle').textContent = 'إنشاء حساب جديد';
+                document.getElementById('emailGroup').style.display = 'block';
+                document.getElementById('authSubmitBtn').textContent = 'تسجيل';
+                document.getElementById('toggleText').textContent = 'لديك حساب بالفعل؟';
+                document.getElementById('toggleLink').textContent = 'تسجيل دخول';
             }
             
-            document.getElementById('authError').style.display = 'none';
+            document.getElementById('authMessage').innerHTML = '';
         });
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        document.getElementById('authForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            
+            const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+            const payload = isLogin 
+                ? { username, password }
+                : { username, email, password };
+            
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify(payload)
                 });
-
+                
                 const data = await response.json();
-
+                
                 if (data.success) {
                     currentUser = { username: data.username };
                     showChat();
+                    loadHistory();
                 } else {
-                    showError(data.error);
+                    document.getElementById('authMessage').innerHTML = 
+                        `<div class="error-message">${data.error}</div>`;
                 }
             } catch (error) {
-                showError('فشل تسجيل الدخول');
+                document.getElementById('authMessage').innerHTML = 
+                    `<div class="error-message">حدث خطأ في الاتصال</div>`;
             }
         });
-
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('registerUsername').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-
-            try {
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    currentUser = { username: data.username };
-                    showChat();
-                } else {
-                    showError(data.error);
-                }
-            } catch (error) {
-                showError('فشل إنشاء الحساب');
-            }
-        });
-
-        function showError(message) {
-            const errorDiv = document.getElementById('authError');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-        }
 
         function showChat() {
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('chatContainer').style.display = 'flex';
-            document.getElementById('usernameDisplay').textContent = currentUser.username;
-            loadHistory();
+            document.getElementById('currentUsername').textContent = currentUser.username;
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                location.reload();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
         }
 
         async function loadHistory() {
@@ -527,102 +497,104 @@
                     chatArea.innerHTML = '';
                     
                     data.history.forEach(msg => {
-                        addMessageToUI(msg.role, msg.content);
+                        addMessageToChat(msg.role, msg.content, false);
                     });
+                    
+                    scrollToBottom();
                 }
             } catch (error) {
-                console.error('Failed to load history:', error);
+                console.error('Error loading history:', error);
             }
         }
 
-        document.getElementById('imageInput').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    selectedImage = e.target.result.split(',')[1];
-                    alert('تم اختيار الصورة! اضغط إرسال للتحليل');
-                };
-                reader.readAsDataURL(file);
+        function addMessageToChat(role, content, animate = true) {
+            const chatArea = document.getElementById('chatArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (role === 'assistant') {
+                contentDiv.innerHTML = linkify(content);
+            } else {
+                contentDiv.textContent = content;
             }
-        });
+            
+            messageDiv.appendChild(contentDiv);
+            
+            const typingIndicator = document.getElementById('typingIndicator');
+            chatArea.insertBefore(messageDiv, typingIndicator);
+            
+            if (animate) {
+                scrollToBottom();
+            }
+        }
 
         async function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
             
-            if (!message && !selectedImage) return;
-
+            if (!message) return;
+            
             const sendBtn = document.getElementById('sendBtn');
             sendBtn.disabled = true;
-            input.disabled = true;
-
-            if (message) {
-                addMessageToUI('user', message);
-            }
-            if (selectedImage) {
-                addMessageToUI('user', '[صورة]');
-            }
-
-            const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'message assistant';
-            typingIndicator.innerHTML = `
-                <div class="message-avatar">🤖</div>
-                <div class="typing-indicator show">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-            `;
-            document.getElementById('chatArea').appendChild(typingIndicator);
+            
+            addMessageToChat('user', message);
+            input.value = '';
+            
+            document.getElementById('typingIndicator').style.display = 'block';
             scrollToBottom();
-
+            
             try {
                 const response = await fetch('/api/chat/send', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        message: message,
-                        image: selectedImage 
-                    })
+                    body: JSON.stringify({ message })
                 });
-
+                
                 const data = await response.json();
-
-                typingIndicator.remove();
-
+                
+                document.getElementById('typingIndicator').style.display = 'none';
+                
                 if (data.success) {
-                    addMessageToUI('assistant', data.response);
+                    addMessageToChat('assistant', data.response);
                 } else {
-                    addMessageToUI('assistant', 'عذراً، حدث خطأ. حاول مرة أخرى.');
+                    addMessageToChat('assistant', 'عذراً، حدث خطأ. حاول مرة أخرى.');
                 }
             } catch (error) {
-                typingIndicator.remove();
-                addMessageToUI('assistant', 'عذراً، حدث خطأ في الاتصال.');
+                document.getElementById('typingIndicator').style.display = 'none';
+                addMessageToChat('assistant', 'عذراً، حدث خطأ في الاتصال.');
+            } finally {
+                sendBtn.disabled = false;
             }
-
-            input.value = '';
-            selectedImage = null;
-            document.getElementById('imageInput').value = '';
-            sendBtn.disabled = false;
-            input.disabled = false;
-            input.focus();
         }
 
-        function addMessageToUI(role, content) {
-            const chatArea = document.getElementById('chatArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}`;
+        async function clearChat() {
+            if (!confirm('هل تريد مسح المحادثة؟')) return;
             
-            const avatar = role === 'user' ? '👤' : '🤖';
-            
-            messageDiv.innerHTML = `
-                <div class="message-avatar">${avatar}</div>
-                <div class="message-content">${content.replace(/\n/g, '<br>')}</div>
-            `;
-            
-            chatArea.appendChild(messageDiv);
-            scrollToBottom();
+            try {
+                const response = await fetch('/api/chat/clear', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const chatArea = document.getElementById('chatArea');
+                    chatArea.innerHTML = `
+                        <div class="message assistant">
+                            <div class="message-content">
+                                تم مسح المحادثة. ابدأ محادثة جديدة! 🔄
+                            </div>
+                        </div>
+                        <div class="typing-indicator" id="typingIndicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error clearing chat:', error);
+            }
         }
 
         function scrollToBottom() {
@@ -630,37 +602,13 @@
             chatArea.scrollTop = chatArea.scrollHeight;
         }
 
-        async function clearChat() {
-            if (!confirm('هل تريد مسح جميع الرسائل؟')) return;
-
-            try {
-                const response = await fetch('/api/chat/clear', { method: 'POST' });
-                const data = await response.json();
-
-                if (data.success) {
-                    const chatArea = document.getElementById('chatArea');
-                    chatArea.innerHTML = `
-                        <div class="message assistant">
-                            <div class="message-avatar">🤖</div>
-                            <div class="message-content">
-                                تم مسح المحادثة! ابدأ محادثة جديدة 🔄
-                            </div>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                alert('فشل مسح المحادثة');
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
             }
-        }
+        });
 
-        async function logout() {
-            try {
-                await fetch('/api/auth/logout', { method: 'POST' });
-                location.reload();
-            } catch (error) {
-                alert('فشل تسجيل الخروج');
-            }
-        }
+        checkAuth();
     </script>
 </body>
 </html>
