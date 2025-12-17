@@ -2,6 +2,8 @@
 Afaq Store Bot - Main Application
 """
 import requests
+import web_database
+import auth_database
 from config import Config
 from datetime import datetime
 from utils.logger import logger
@@ -18,6 +20,7 @@ from handlers.telegram import process_telegram_message
 Config.validate()
 
 app = Flask(__name__)
+app.secret_key = Config.SECRET_KEY
 
 app.register_blueprint(health_bp)
 app.register_blueprint(metrics_bp)
@@ -40,7 +43,7 @@ def telegram_webhook():
 
 @app.route("/")
 def home():
-    """Home page - automatically sets up Telegram webhook"""
+    """Home page - shows Telegram & Web server status"""
     if not Config.TELEGRAM_TOKEN:
         return """
         <html>
@@ -69,6 +72,14 @@ def home():
         ).json()
         pending_updates = info_result.get("result", {}).get("pending_update_count", 0)
 
+        telegram_db_status = '✅ Connected' if Config.TELEGRAM_DATABASE_URL else '❌ Not configured'
+        web_db_status = '✅ Connected' if Config.WEB_DATABASE_URL else '❌ Not configured'
+        auth_db_status = '✅ Connected' if Config.AUTH_DATABASE_URL else '❌ Not configured'
+
+        web_server_status = "✅ Active"
+        web_server_color = "#28a745"
+        web_server_url = f"https://{domain}"
+
         return f"""
         <html>
         <head>
@@ -76,7 +87,7 @@ def home():
             <style>
                 body {{ 
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-                    max-width: 900px; 
+                    max-width: 1000px; 
                     margin: 0 auto; 
                     padding: 20px;
                     background: #f5f5f5;
@@ -91,6 +102,11 @@ def home():
                     color: #2c3e50; 
                     border-bottom: 3px solid #3498db;
                     padding-bottom: 10px;
+                }}
+                h3 {{
+                    color: #34495e;
+                    margin-top: 25px;
+                    margin-bottom: 15px;
                 }}
                 .status {{ 
                     padding: 15px; 
@@ -108,6 +124,32 @@ def home():
                     border-color: #17a2b8;
                     color: #0c5460; 
                 }}
+                .server-section {{
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    margin: 25px 0;
+                }}
+                .server-card {{
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 8px;
+                    border: 2px solid #dee2e6;
+                }}
+                .server-card.active {{
+                    border-color: #28a745;
+                    background: #d4edda;
+                }}
+                .server-card h4 {{
+                    margin-top: 0;
+                    color: #2c3e50;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }}
+                .server-icon {{
+                    font-size: 24px;
+                }}
                 a {{ 
                     color: #007bff; 
                     text-decoration: none;
@@ -124,11 +166,13 @@ def home():
                 }}
                 .badge-success {{ background: #28a745; color: white; }}
                 .badge-info {{ background: #17a2b8; color: white; }}
+                .badge-warning {{ background: #ffc107; color: #000; }}
                 code {{
                     background: #f4f4f4;
                     padding: 2px 6px;
                     border-radius: 3px;
                     font-family: 'Courier New', monospace;
+                    font-size: 13px;
                 }}
                 .footer {{
                     margin-top: 30px;
@@ -136,6 +180,25 @@ def home():
                     border-top: 1px solid #dee2e6;
                     color: #6c757d;
                     font-size: 14px;
+                }}
+                .db-section {{
+                    background: #f8f9fa;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                    border-left: 4px solid #6c757d;
+                }}
+                .db-item {{
+                    padding: 8px 0;
+                    border-bottom: 1px solid #dee2e6;
+                }}
+                .db-item:last-child {{
+                    border-bottom: none;
+                }}
+                @media (max-width: 768px) {{
+                    .server-section {{
+                        grid-template-columns: 1fr;
+                    }}
                 }}
             </style>
         </head>
@@ -147,22 +210,55 @@ def home():
                     <strong>Status:</strong> Bot is running successfully on Railway! 🚀
                 </div>
                 
-                <div class="status" style="background-color: {webhook_color}20; border-color: {webhook_color}; color: #333;">
-                    <strong>Telegram Webhook:</strong> {webhook_status}<br>
-                    <small>URL: <code>{webhook_url}</code></small><br>
-                    <small>Pending Updates: {pending_updates}</small>
+                <h3>🌐 Server Status</h3>
+                <div class="server-section">
+                    <!-- Telegram Server Card -->
+                    <div class="server-card {'active' if set_result.get('ok') else ''}">
+                        <h4>
+                            <span class="server-icon">📱</span>
+                            Telegram Server
+                            <span class="badge {'badge-success' if set_result.get('ok') else 'badge-warning'}">
+                                {'Active' if set_result.get('ok') else 'Inactive'}
+                            </span>
+                        </h4>
+                        <p><strong>Webhook Status:</strong> {webhook_status}</p>
+                        <p><strong>Webhook URL:</strong><br><code>{webhook_url}</code></p>
+                        <p><strong>Pending Updates:</strong> {pending_updates}</p>
+                        <p><strong>Active Conversations:</strong> {len(conversation_history)}</p>
+                    </div>
+                    
+                    <!-- Web Server Card -->
+                    <div class="server-card active">
+                        <h4>
+                            <span class="server-icon">💻</span>
+                            Web Server
+                            <span class="badge badge-success">Active</span>
+                        </h4>
+                        <p><strong>Server Status:</strong> {web_server_status}</p>
+                        <p><strong>Web URL:</strong><br><code>{web_server_url}</code></p>
+                        <p><strong>Status:</strong> Ready to accept web requests</p>
+                        <p><strong>Web Interface:</strong> <span class="badge badge-info">Coming Soon</span></p>
+                    </div>
                 </div>
                 
                 <div class="status info">
                     <strong>📦 Products Loaded:</strong> {get_product_count()} <span class="badge badge-info">CSV</span>
                 </div>
                 
-                <div class="status info">
-                    <strong>💬 Active Conversations:</strong> {len(conversation_history)}
-                </div>
-                
-                <div class="status info">
-                    <strong>🗄️  Database:</strong> {'Connected (PostgreSQL)' if Config.DATABASE_URL else 'Not configured'}
+                <div class="db-section">
+                    <h3 style="margin-top: 0;">🗄️  Database Status (3 Separate Databases)</h3>
+                    <div class="db-item">
+                        <strong>📱 Telegram Database:</strong> {telegram_db_status}
+                        <br><small>Stores Telegram conversation history</small>
+                    </div>
+                    <div class="db-item">
+                        <strong>💻 Web Conversations Database:</strong> {web_db_status}
+                        <br><small>Stores web chat conversation history</small>
+                    </div>
+                    <div class="db-item">
+                        <strong>🔐 Authentication Database:</strong> {auth_db_status}
+                        <br><small>Stores user accounts and login credentials</small>
+                    </div>
                 </div>
                 
                 <div style="margin-top: 30px;">
@@ -202,4 +298,11 @@ def internal_error_handler(e):
 
 if __name__ == "__main__":
     logger.info(f"🚀 Starting Afaq Store Bot on Railway (Port: {Config.PORT})")
+    logger.info("📊 Databases:")
+    logger.info(f"  - Telegram DB: {'✅ Configured' if Config.TELEGRAM_DATABASE_URL else '❌ Not configured'}")
+    logger.info(f"  - Web DB: {'✅ Configured' if Config.WEB_DATABASE_URL else '❌ Not configured'}")
+    logger.info(f"  - Auth DB: {'✅ Configured' if Config.AUTH_DATABASE_URL else '❌ Not configured'}")
+    logger.info("🌐 Servers:")
+    logger.info(f"  - Telegram Server: ✅ Will be activated on first webhook")
+    logger.info(f"  - Web Server: ✅ Active on port {Config.PORT}")
     app.run(host="0.0.0.0", port=Config.PORT)
