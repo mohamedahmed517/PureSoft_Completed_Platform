@@ -5,11 +5,11 @@ import io
 import time
 import base64
 from PIL import Image
-from models import MODEL
 from datetime import datetime
 from utils.logger import logger
 from utils.metrics import metrics
 from services.products import build_product_catalog
+from models import CLIENT, GENERATION_CONFIG, SAFETY_SETTINGS
 from services.history import conversation_history, get_conversation_context, add_message
 
 def gemini_chat(text="", image_b64=None, audio_data=None, user_key="unknown"):
@@ -80,18 +80,45 @@ def gemini_chat(text="", image_b64=None, audio_data=None, user_key="unknown"):
         for attempt in range(max_retries):
             try:
                 if audio_data:
-                    audio_io = io.BytesIO(audio_data)
-                    audio_io.name = "voice.ogg"
-                    response = MODEL.generate_content([prompt, audio_io], stream=False)
+                    response = CLIENT.models.generate_content(
+                        model='gemini-2.5-flash',
+                        contents=[
+                            prompt,
+                            {"mime_type": "audio/ogg", "data": audio_data}
+                        ],
+                        config=GENERATION_CONFIG,
+                        safety_settings=SAFETY_SETTINGS
+                    )
                     metrics.track_message("with_audio")
+                    
                 elif image_b64:
                     img = Image.open(io.BytesIO(base64.b64decode(image_b64)))
-                    response = MODEL.generate_content([prompt, img], stream=False)
+                    img_bytes = io.BytesIO()
+                    img.save(img_bytes, format='PNG')
+                    img_bytes.seek(0)
+                    
+                    response = CLIENT.models.generate_content(
+                        model='gemini-2.5-flash',
+                        contents=[
+                            prompt,
+                            {"mime_type": "image/png", "data": img_bytes.read()}
+                        ],
+                        config=GENERATION_CONFIG,
+                        safety_settings=SAFETY_SETTINGS
+                    )
                     metrics.track_message("with_image")
+                    
                 else:
-                    response = MODEL.generate_content(prompt, stream=False)
+                    response = CLIENT.models.generate_content(
+                        model='gemini-2.5-flash',
+                        contents=prompt,
+                        config=GENERATION_CONFIG,
+                        safety_settings=SAFETY_SETTINGS
+                    )
                     metrics.track_message("text_only")
+                    
                 break
+                
             except Exception as e:
                 logger.warning(f"⚠️  Gemini API attempt {attempt + 1}/{max_retries} failed: {e}")
                 if attempt < max_retries - 1:
