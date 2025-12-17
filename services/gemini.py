@@ -68,7 +68,11 @@ def gemini_chat(text="", image_b64=None, audio_data=None, user_key="unknown"):
         response = None
         for attempt in range(max_retries):
             try:
+                # Get config dict and remove safety_settings if present
                 config_dict = GENERATION_CONFIG.model_dump() if hasattr(GENERATION_CONFIG, 'model_dump') else GENERATION_CONFIG.dict()
+                # Remove safety_settings from config_dict to avoid duplicate
+                config_dict.pop('safety_settings', None)
+                
                 if audio_data:
                     response = CLIENT.models.generate_content(
                         model='gemini-2.5-flash',
