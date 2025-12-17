@@ -1,4 +1,4 @@
-from database import save_telegram_conversation_to_db, load_all_telegram_conversations
+from telegram_database import save_telegram_conversation_to_db, load_all_telegram_conversations
 
 def save_all_conversations():
     """Background task to periodically save all conversations"""
@@ -23,3 +23,4 @@ def init_conversation_history():
     conversations = load_all_telegram_conversations()
     conversation_history.update(conversations)
     logger.info(f"✅ Loaded {len(conversations)} conversation histories")
+
