@@ -1,6 +1,7 @@
 flask
 pandas
 Pillow
+bcrypt
 requests
 gunicorn
 python-dotenv
