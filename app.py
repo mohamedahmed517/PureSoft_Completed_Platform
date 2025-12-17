@@ -2,10 +2,10 @@
 Afaq Store Bot - Main Application
 """
 import requests
+import web_database
+import auth_database
 from config import Config
-import services.web_database
 from datetime import datetime
-import services.auth_database
 from utils.logger import logger
 from routes.admin import admin_bp
 from utils.metrics import metrics
@@ -306,4 +306,3 @@ if __name__ == "__main__":
     logger.info(f"  - Telegram Server: ✅ Will be activated on first webhook")
     logger.info(f"  - Web Server: ✅ Active on port {Config.PORT}")
     app.run(host="0.0.0.0", port=Config.PORT)
-
