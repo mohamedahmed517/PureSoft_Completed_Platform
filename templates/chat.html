@@ -618,7 +618,7 @@
             
             messageDiv.innerHTML = `
             <div class="message-avatar">${avatar}</div>
-            <div class="message-content">${content.replace(/\n/g, '<br>').replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: #667eea; text-decoration: underline;">$1</a>')}</div>
+            <div class="message-content">${content.replace(/\n/g, '<br>').replace(/(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/g, '<a href="$1" target="_blank" style="color: #667eea; text-decoration: underline;">$1</a>')}</div>
             `;
             
             chatArea.appendChild(messageDiv);
@@ -664,3 +664,4 @@
     </script>
 </body>
 </html>
+
