@@ -17,9 +17,11 @@ An intelligent Telegram bot for Afaq Store that helps customers find products us
 
 ```
 afaq-store-bot/
-├── app.py                  # Main Flask application
+├── app.py                 # Main Flask application
 ├── config.py              # Configuration management
-├── database.py            # Database operations
+├── web_database.py        # Web database operations
+├── telegram_database.py   # Telegram database operations
+├── auth_database.py       # Auth database operations
 ├── models.py              # AI model initialization
 ├── handlers/
 │   ├── telegram.py        # Telegram handlers
@@ -36,6 +38,7 @@ afaq-store-bot/
     ├── health.py          # Health check
     ├── metrics.py         # Metrics endpoint
     └── admin.py           # Admin endpoints
+    └── web_chat.py        # Web chat
 ```
 
 ## 🚀 Quick Start
@@ -188,3 +191,4 @@ For issues and questions, please open a GitHub issue.
 - Deployed on [Railway](https://railway.app)
 
 - Telegram Bot API
+
