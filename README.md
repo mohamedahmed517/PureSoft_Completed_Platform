@@ -23,6 +23,8 @@ afaq-store-bot/
 ├── telegram_database.py   # Telegram database operations
 ├── auth_database.py       # Auth database operations
 ├── models.py              # AI model initialization
+├── templates/
+│   ├── chat.html          # Web browser
 ├── handlers/
 │   ├── telegram.py        # Telegram handlers
 │   └── commands.py        # Bot commands
@@ -191,4 +193,5 @@ For issues and questions, please open a GitHub issue.
 - Deployed on [Railway](https://railway.app)
 
 - Telegram Bot API
+
 
