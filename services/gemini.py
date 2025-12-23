@@ -190,8 +190,3 @@ def gemini_chat(text="", image_b64=None, audio_data=None, user_key="unknown"):
         logger.error(f"❌ Error in gemini_chat: {e}", exc_info=True)
         metrics.track_error("gemini_chat")
         return "ثواني بس فيه مشكلة دلوقتي هحلها وارجعلك..."
-
-
-
-
-
